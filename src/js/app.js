@@ -8,7 +8,6 @@ App = {
     },
 
     initWeb3: function () {
-        // TODO: refactor conditional
         if (typeof web3 !== "undefined") {
             App.web3Provider = web3.currentProvider;
             web3 = new Web3(web3.currentProvider);
@@ -23,9 +22,7 @@ App = {
 
     initContract: function () {
         $.getJSON("SafeTrade.json", function (safeTrade) {
-            // Instantiate a new truffle contract from the artifact
             App.contracts.SafeTrade = TruffleContract(safeTrade);
-            // Connect provider to interact with contract
             App.contracts.SafeTrade.setProvider(App.web3Provider);
 
             App.listenForEvents();
@@ -34,14 +31,10 @@ App = {
         });
     },
 
-    // Listen for events emitted from the contract
     listenForEvents: function () {
         App.contracts.SafeTrade.deployed().then(function (instance) {
-            // Restart Chrome if you are unable to receive this event
-            // This is a known issue with Metamask
-            // https://github.com/MetaMask/metamask-extension/issues/2393
             instance
-                .votedEvent(
+                .buyEvent(
                     {},
                     {
                         fromBlock: 0,
@@ -50,7 +43,6 @@ App = {
                 )
                 .watch(function (error, event) {
                     console.log("event triggered", event);
-                    // Reload when a new vote is recorded
                     App.render();
                 });
         });
@@ -64,7 +56,6 @@ App = {
         loader.show();
         content.hide();
 
-        // Load account data
         web3.eth.getCoinbase(function (err, account) {
             if (err === null) {
                 App.account = account;
@@ -72,7 +63,6 @@ App = {
             }
         });
 
-        // Load contract data
         App.contracts.SafeTrade.deployed()
             .then(function (instance) {
                 safeTradeInstance = instance;
@@ -93,7 +83,6 @@ App = {
                         var buyer = item[3];
                         var isReserved = item[4];
 
-                        // Render item Result
                         var itemTemplate =
                             "<tr><th>" +
                             id +
@@ -109,7 +98,6 @@ App = {
                             "</td></tr>";
                         itemListing.append(itemTemplate);
 
-                        // Render item ballot option
                         var itemOption =
                             "<option value='" +
                             id +
@@ -134,7 +122,6 @@ App = {
                 return instance.buy(itemId, {from: App.account});
             })
             .then(function (result) {
-                // Wait for votes to update
                 $("#content").hide();
                 $("#loader").show();
             })

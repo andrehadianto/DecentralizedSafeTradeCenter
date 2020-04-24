@@ -9,9 +9,9 @@ contract SafeTrade {
         address buyer;
         bool isReserved;
     }
-
-    mapping(uint256 => Item) public items;
     uint256 public itemCount;
+    mapping(uint256 => Item) public items;
+    event buyEvent(uint256 indexed _itemId);
 
     constructor() public {
         addItem("item1", 100);
@@ -30,7 +30,7 @@ contract SafeTrade {
         items[_itemId].isReserved = true;
         // record who buy
         items[_itemId].buyer = msg.sender;
+        emit buyEvent(_itemId);
     }
 }
 
-// https://youtu.be/3681ZYbDSSk?t=3390
