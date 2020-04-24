@@ -24,7 +24,8 @@ contract("SafeTrade", function (accounts) {
                     "item1",
                     "contains the correct item name"
                 );
-                assert.equal(item[2], 100, "scontains the correct item price");
+                assert.equal(item[2], 100, "contains the correct item price");
+                assert.equal(item[3], false, "item is not reserved yet");
                 return safeTradeInstance.items(2);
             })
             .then(function (item) {
@@ -35,6 +36,7 @@ contract("SafeTrade", function (accounts) {
                     "contains the correct item name"
                 );
                 assert.equal(item[2], 200, "scontains the correct item price");
+                assert.equal(item[3], false, "item is not reserved yet");
             });
     });
 });

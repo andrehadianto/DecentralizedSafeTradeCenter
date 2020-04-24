@@ -36,6 +36,7 @@
                   <th scope="col">Item Name</th>
                   <th scope="col">Image</th>
                   <th scope="col">Price</th>
+                  <th scope="col">Reserved</th>
                 </tr>
               </thead>
               <tbody id="itemListing">
@@ -44,7 +45,7 @@
 
             <hr/>
 
-            {% comment %} <form onSubmit="App.castVote(); return false;">
+            <form onSubmit="App.buyItem(); return false;">
               <div class="form-group">
                 <label for="itemSelect">Select Item</label>
                 <select class="form-control" id="itemSelect">
@@ -52,7 +53,7 @@
               </div>
               <button type="submit" class="btn btn-primary">Buy</button>
               <hr />
-            </form> {% endcomment %}
+            </form> 
             <p id="accountAddress" class="text-center"></p>
           </div>
         </div>

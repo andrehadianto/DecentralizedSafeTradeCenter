@@ -90,6 +90,8 @@ App = {
                         var id = item[0];
                         var name = item[1];
                         var itemPrice = item[2];
+                        var buyer = item[3];
+                        var isReserved = item[4];
 
                         // Render item Result
                         var itemTemplate =
@@ -102,6 +104,8 @@ App = {
                             "</td><td>" +
                             "SGD " +
                             itemPrice +
+                            "</td><td>" +
+                            isReserved +
                             "</td></tr>";
                         itemListing.append(itemTemplate);
 
@@ -117,28 +121,27 @@ App = {
                 }
                 loader.hide();
                 content.show();
-                return safeTradeInstance.voters(App.account);
             })
             .catch(function (error) {
                 console.warn(error);
             });
     },
 
-    // castVote: function () {
-    //     var candidateId = $("#itemSelect").val();
-    //     App.contracts.SafeTrade.deployed()
-    //         .then(function (instance) {
-    //             return instance.vote(candidateId, {from: App.account});
-    //         })
-    //         .then(function (result) {
-    //             // Wait for votes to update
-    //             $("#content").hide();
-    //             $("#loader").show();
-    //         })
-    //         .catch(function (err) {
-    //             console.error(err);
-    //         });
-    // },
+    buyItem: function () {
+        var itemId = $("#itemSelect").val();
+        App.contracts.SafeTrade.deployed()
+            .then(function (instance) {
+                return instance.buy(itemId, {from: App.account});
+            })
+            .then(function (result) {
+                // Wait for votes to update
+                $("#content").hide();
+                $("#loader").show();
+            })
+            .catch(function (err) {
+                console.error(err);
+            });
+    },
 };
 
 $(function () {
