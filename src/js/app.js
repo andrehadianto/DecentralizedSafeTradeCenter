@@ -98,6 +98,9 @@ App = {
                             "</th><td>" +
                             name +
                             "</td><td>" +
+                            `<img src='http://placekitten.com/200/150?image=${id}'` +
+                            "</td><td>" +
+                            "SGD " +
                             itemPrice +
                             "</td></tr>";
                         itemListing.append(itemTemplate);
