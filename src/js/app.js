@@ -1,68 +1,145 @@
 App = {
-  web3Provider: null,
-  contracts: {},
+    web3Provider: null,
+    contracts: {},
+    account: "0x0",
 
-  init: async function() {
-    // Load pets.
-    $.getJSON('../pets.json', function(data) {
-      var petsRow = $('#petsRow');
-      var petTemplate = $('#petTemplate');
+    init: function () {
+        return App.initWeb3();
+    },
 
-      for (i = 0; i < data.length; i ++) {
-        petTemplate.find('.panel-title').text(data[i].name);
-        petTemplate.find('img').attr('src', data[i].picture);
-        petTemplate.find('.pet-breed').text(data[i].breed);
-        petTemplate.find('.pet-age').text(data[i].age);
-        petTemplate.find('.pet-location').text(data[i].location);
-        petTemplate.find('.btn-adopt').attr('data-id', data[i].id);
+    initWeb3: function () {
+        // TODO: refactor conditional
+        if (typeof web3 !== "undefined") {
+            App.web3Provider = web3.currentProvider;
+            web3 = new Web3(web3.currentProvider);
+        } else {
+            App.web3Provider = new Web3.providers.HttpProvider(
+                "http://localhost:7545"
+            );
+            web3 = new Web3(App.web3Provider);
+        }
+        return App.initContract();
+    },
 
-        petsRow.append(petTemplate.html());
-      }
-    });
+    initContract: function () {
+        $.getJSON("SafeTrade.json", function (safeTrade) {
+            // Instantiate a new truffle contract from the artifact
+            App.contracts.SafeTrade = TruffleContract(safeTrade);
+            // Connect provider to interact with contract
+            App.contracts.SafeTrade.setProvider(App.web3Provider);
 
-    return await App.initWeb3();
-  },
+            App.listenForEvents();
 
-  initWeb3: async function() {
-    /*
-     * Replace me...
-     */
+            return App.render();
+        });
+    },
 
-    return App.initContract();
-  },
+    // Listen for events emitted from the contract
+    listenForEvents: function () {
+        App.contracts.SafeTrade.deployed().then(function (instance) {
+            // Restart Chrome if you are unable to receive this event
+            // This is a known issue with Metamask
+            // https://github.com/MetaMask/metamask-extension/issues/2393
+            instance
+                .votedEvent(
+                    {},
+                    {
+                        fromBlock: 0,
+                        toBlock: "latest",
+                    }
+                )
+                .watch(function (error, event) {
+                    console.log("event triggered", event);
+                    // Reload when a new vote is recorded
+                    App.render();
+                });
+        });
+    },
 
-  initContract: function() {
-    /*
-     * Replace me...
-     */
+    render: function () {
+        var safeTradeInstance;
+        var loader = $("#loader");
+        var content = $("#content");
 
-    return App.bindEvents();
-  },
+        loader.show();
+        content.hide();
 
-  bindEvents: function() {
-    $(document).on('click', '.btn-adopt', App.handleAdopt);
-  },
+        // Load account data
+        web3.eth.getCoinbase(function (err, account) {
+            if (err === null) {
+                App.account = account;
+                $("#accountAddress").html("Your Account: " + account);
+            }
+        });
 
-  markAdopted: function(adopters, account) {
-    /*
-     * Replace me...
-     */
-  },
+        // Load contract data
+        App.contracts.SafeTrade.deployed()
+            .then(function (instance) {
+                safeTradeInstance = instance;
+                return safeTradeInstance.itemCount();
+            })
+            .then(function (itemCount) {
+                var itemListing = $("#itemListing");
+                itemListing.empty();
 
-  handleAdopt: function(event) {
-    event.preventDefault();
+                var itemSelect = $("#itemSelect");
+                itemSelect.empty();
 
-    var petId = parseInt($(event.target).data('id'));
+                for (var i = 1; i <= itemCount; i++) {
+                    safeTradeInstance.items(i).then(function (item) {
+                        var id = item[0];
+                        var name = item[1];
+                        var itemPrice = item[2];
 
-    /*
-     * Replace me...
-     */
-  }
+                        // Render item Result
+                        var itemTemplate =
+                            "<tr><th>" +
+                            id +
+                            "</th><td>" +
+                            name +
+                            "</td><td>" +
+                            itemPrice +
+                            "</td></tr>";
+                        itemListing.append(itemTemplate);
 
+                        // Render item ballot option
+                        var itemOption =
+                            "<option value='" +
+                            id +
+                            "' >" +
+                            name +
+                            "</ option>";
+                        itemSelect.append(itemOption);
+                    });
+                }
+                loader.hide();
+                content.show();
+                return safeTradeInstance.voters(App.account);
+            })
+            .catch(function (error) {
+                console.warn(error);
+            });
+    },
+
+    // castVote: function () {
+    //     var candidateId = $("#itemSelect").val();
+    //     App.contracts.SafeTrade.deployed()
+    //         .then(function (instance) {
+    //             return instance.vote(candidateId, {from: App.account});
+    //         })
+    //         .then(function (result) {
+    //             // Wait for votes to update
+    //             $("#content").hide();
+    //             $("#loader").show();
+    //         })
+    //         .catch(function (err) {
+    //             console.error(err);
+    //         });
+    // },
 };
 
-$(function() {
-  $(window).load(function() {
-    App.init();
-  });
+$(function () {
+    $(window).load(function () {
+        App.init();
+    });
 });
