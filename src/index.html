@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>Safe Trade Center</title>
 
@@ -18,57 +18,74 @@
     <![endif]-->
   </head>
   <body>
-    <div class="container" style="max-width: 1200px; min-width: 650px; display: block;">
-      <div class="row">
-        <div class="col-lg-12">
-          <h1 class="text-center">Safe Trade Center</h1>
-          <hr/>
-          <br/>
-          <div id="loader">
-            <p class="text-center">Loading...</p>
-          </div>
-          <div id="content" style="display: none;">
-
-            <table class="table" style="min-width: 900px;">
-              <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Item Name</th>
-                  <th scope="col">Image</th>
-                  <th scope="col">Price</th>
-                  <th scope="col">Reserved</th>
-                  <th scope="col">Buyer</th>
-                  <th scope="col">Seller</th>
-                  <th scope="col">Action</th>
-                </tr>
-              </thead>
-              <tbody id="itemListing">
-              </tbody>
-            </table>
-
-            <hr/>
-
-            <form onSubmit="App.addItem(); return false;" style="width: 650px; margin: 10px auto">
-              <h3>Add Item</h3>
-              <div class="form-group">
-                <label for="itemName">Item Name</label>
-                <input class="form-control" id="itemName"/>
-                <label for="itemPrice">Price</label>
-                <input class="form-control" type="number" id="itemPrice"/>
-                <label for="itemImg">Link to img</label>
-                <input class="form-control" id="itemImg" placeholder="(Optional)"/>
+    <div style="width: 1400px; margin: 0 auto;">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col">
+            <div style="background:transparent !important" class="jumbotron jumbotron-fluid">
+              <div class="container">
+                <h1 class="display-4">Safe Trade Center</h1>
+                <p class="lead">Super secure trading platform!</p>
               </div>
-              <button type="submit" class="btn btn-primary">Sell</button>
-              <hr />
-            </form>
-            <p id="accountAddress" class="text-center"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <div id="loader">
+              <p class="text-center">Loading...</p>
+            </div>
+            <div id="content" style="display: none;">
+              <div class="row">
+                <div class="col">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Item Name</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Reserved</th>
+                        <th scope="col">Buyer</th>
+                        <th scope="col">Seller</th>
+                        <th scope="col">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="itemListing">
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <hr/>
+              
+              <div class="row">
+                <div class="col-6 ml-auto mr-auto">
+                  <form onSubmit="App.addItem(); return false;">
+                    <h3>Add Item</h3>
+                    <div class="form-group">
+                      <label for="itemName">Item Name</label>
+                      <input class="form-control" id="itemName"/>
+                      <label for="itemPrice">Price</label>
+                      <input class="form-control" type="number" id="itemPrice"/>
+                      <label for="itemImg">Link to img</label>
+                      <input class="form-control" id="itemImg" placeholder="(Optional)"/>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Sell</button>
+                    <hr />
+                  </form>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
     <script src="js/web3.min.js"></script>
