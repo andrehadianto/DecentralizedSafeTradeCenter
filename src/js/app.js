@@ -143,10 +143,11 @@ App = {
                             _name.innerHTML = name;
                             var _img = document.createElement("td");
                             var _img2 = document.createElement("img");
+                            _img2.className = "img-thumbnail mx-auto d-block"
                             _img2.setAttribute("src", img);
                             _img.append(_img2);
                             var _itemPrice = document.createElement("td");
-                            _itemPrice.innerHTML = itemPrice;
+                            _itemPrice.innerHTML = "ETH " + itemPrice;
                             var _isReserved = document.createElement("td");
                             _isReserved.innerHTML = isReserved;
                             var _buyer = document.createElement("td");
