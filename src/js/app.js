@@ -3,11 +3,11 @@ App = {
     contracts: {},
     account: "0x0",
 
-    init: function () {
+    init: () => {
         return App.initWeb3();
     },
 
-    initWeb3: function () {
+    initWeb3: () => {
         if (typeof web3 !== "undefined") {
             App.web3Provider = web3.currentProvider;
             web3 = new Web3(web3.currentProvider);
@@ -20,8 +20,8 @@ App = {
         return App.initContract();
     },
 
-    initContract: function () {
-        $.getJSON("SafeTrade.json", function (safeTrade) {
+    initContract: () => {
+        $.getJSON("SafeTrade.json", (safeTrade) => {
             App.contracts.SafeTrade = TruffleContract(safeTrade);
             App.contracts.SafeTrade.setProvider(App.web3Provider);
 
@@ -30,8 +30,8 @@ App = {
         });
     },
 
-    listenForEvents: function () {
-        App.contracts.SafeTrade.deployed().then(function (instance) {
+    listenForEvents: () => {
+        App.contracts.SafeTrade.deployed().then((instance) => {
             instance
                 .buyEvent(
                     {},
@@ -39,7 +39,7 @@ App = {
                         fromBlock: "latest",
                     }
                 )
-                .watch(function (err, event) {
+                .watch((err, event) => {
                     console.log("event triggered", event);
                 });
             instance
@@ -49,7 +49,7 @@ App = {
                         fromBlock: "latest",
                     }
                 )
-                .watch(function (err, event) {
+                .watch((err, event) => {
                     console.log("event triggered", event);
                 });
             instance
@@ -59,21 +59,21 @@ App = {
                         fromBlock: "latest",
                     }
                 )
-                .watch(function (err, event) {
+                .watch((err, event) => {
                     console.log("event triggered", event);
                     App.render();
                 });
         });
     },
 
-    render: function () {
+    render: () => {
         var safeTradeInstance;
         var loader = $("#loader");
         var content = $("#content");
         loader.show();
         content.hide();
 
-        web3.eth.getCoinbase(function (err, account) {
+        web3.eth.getCoinbase((err, account) => {
             if (err === null) {
                 App.account = account;
                 $("#accountAddress").html("Your Account: " + account);
@@ -81,43 +81,41 @@ App = {
         });
 
         App.contracts.SafeTrade.deployed()
-            .then(function (instance) {
+            .then((instance) => {
                 safeTradeInstance = instance;
                 return safeTradeInstance.itemCount();
             })
-            .then(function (itemCount) {
+            .then((itemCount) => {
                 var activeAccount = document.createElement("p");
                 activeAccount.innerHTML = "Active account: " + App.account;
                 $("#activeAccount").append(activeAccount);
 
                 var withdrawOverview = $("#withdrawOverview");
                 withdrawOverview.empty();
-                safeTradeInstance
-                    .balances(App.account)
-                    .then(function (balance) {
-                        var accountBalance = balance;
-                        var withdrawWrapper = document.createElement("div");
-                        var withdrawData1 = document.createElement("p");
-                        withdrawData1.innerHTML =
-                            "TRANSFER FROM: " + "SAFE TRADE CENTER";
-                        var withdrawData2 = document.createElement("p");
-                        withdrawData2.innerHTML = "TRANSFER TO: " + App.account;
-                        var withdrawData3 = document.createElement("p");
-                        withdrawData3.innerHTML =
-                            "AMOUNT: ETH " + accountBalance / Math.pow(10, 18);
+                safeTradeInstance.balances(App.account).then((balance) => {
+                    var accountBalance = balance;
+                    var withdrawWrapper = document.createElement("div");
+                    var withdrawData1 = document.createElement("p");
+                    withdrawData1.innerHTML =
+                        "TRANSFER FROM: " + "SAFE TRADE CENTER";
+                    var withdrawData2 = document.createElement("p");
+                    withdrawData2.innerHTML = "TRANSFER TO: " + App.account;
+                    var withdrawData3 = document.createElement("p");
+                    withdrawData3.innerHTML =
+                        "AMOUNT: ETH " + accountBalance / Math.pow(10, 18);
 
-                        withdrawWrapper.append(
-                            withdrawData1,
-                            withdrawData2,
-                            withdrawData3
-                        );
-                        withdrawOverview.append(withdrawWrapper);
-                    });
+                    withdrawWrapper.append(
+                        withdrawData1,
+                        withdrawData2,
+                        withdrawData3
+                    );
+                    withdrawOverview.append(withdrawWrapper);
+                });
 
                 var itemListing = $("#itemListing");
                 itemListing.empty();
                 for (var i = 1; i <= itemCount.toNumber(); i++) {
-                    safeTradeInstance.items(i).then(function (item) {
+                    safeTradeInstance.items(i).then((item) => {
                         var id = item[0];
                         var name = item[1];
                         var itemPrice = item[2] / Math.pow(10, 18);
@@ -131,9 +129,9 @@ App = {
                             buyButton.innerHTML = "Buy";
                             buyButton.className = "btn btn-primary";
                             buyButton.style.cssText = "margin-right:10px;";
-                            buyButton.addEventListener("click", function () {
+                            buyButton.addEventListener("click", () => {
                                 App.contracts.SafeTrade.deployed()
-                                    .then(function (instance) {
+                                    .then((instance) => {
                                         return instance.buy(id, {
                                             from: App.account,
                                             value: web3.toWei(
@@ -142,11 +140,11 @@ App = {
                                             ),
                                         });
                                     })
-                                    .then(function (res) {
+                                    .then((res) => {
                                         content.hide();
                                         loader.show();
                                     })
-                                    .catch(function (err) {
+                                    .catch((err) => {
                                         console.error(err);
                                     });
                             });
@@ -154,18 +152,18 @@ App = {
                             var dealButton = document.createElement("button");
                             dealButton.innerHTML = "Deal";
                             dealButton.className = "btn btn-dark";
-                            dealButton.addEventListener("click", function () {
+                            dealButton.addEventListener("click", () => {
                                 App.contracts.SafeTrade.deployed()
-                                    .then(function (instance) {
+                                    .then((instance) => {
                                         return instance.confirm(id, {
                                             from: App.account,
                                         });
                                     })
-                                    .then(function (res) {
+                                    .then((res) => {
                                         $("#content").hide();
                                         $("#loader").show();
                                     })
-                                    .then(function (err) {
+                                    .then((err) => {
                                         console.error(err);
                                     });
                             });
@@ -198,10 +196,10 @@ App = {
                             var cardClose = document.createElement("span");
                             cardClose.className = "pull-right clickable";
                             cardClose.style.cssText = "cursor: pointer;";
-                            cardClose.addEventListener("click", function () {
+                            cardClose.addEventListener("click", () => {
                                 App.contracts.SafeTrade.deployed()
-                                    .then(function (instance) {
-                                        return instance.delete(id, {
+                                    .then((instance) => {
+                                        return instance.removeListing(id, {
                                             from: App.account,
                                         });
                                     })
@@ -267,37 +265,37 @@ App = {
                 loader.hide();
                 content.show();
             })
-            .catch(function (err) {
+            .catch((err) => {
                 console.warn(err);
             });
     },
 
-    addItem: function () {
+    addItem: () => {
         var itemName = $("#itemName").val();
         var itemPrice = $("#itemPrice").val() * Math.pow(10, 18);
         var imgLink = $("#itemImg").val() ? $("#itemImg").val() : "";
         App.contracts.SafeTrade.deployed()
-            .then(function (instance) {
+            .then((instance) => {
                 return instance.addItem(itemName, itemPrice, imgLink, {
                     from: App.account,
                 });
             })
-            .then(function (res) {
+            .then((res) => {
                 $("#addItemModal").modal("hide");
                 $("#content").hide();
                 $("#loader").show();
             })
-            .catch(function (err) {
+            .catch((err) => {
                 console.error(err);
             });
     },
 
-    withdrawAll: function () {
+    withdrawAll: () => {
         App.contracts.SafeTrade.deployed()
-            .then(function (instance) {
+            .then((instance) => {
                 return instance.withdrawAll({from: App.account});
             })
-            .then(function (res) {
+            .then((res) => {
                 $("#withdrawModal").modal("hide");
                 $("#content").hide();
                 $("#loader").show();
@@ -308,8 +306,8 @@ App = {
     },
 };
 
-$(function () {
-    $(window).on("load", function () {
+$(() => {
+    $(window).on("load", () => {
         App.init();
     });
 });

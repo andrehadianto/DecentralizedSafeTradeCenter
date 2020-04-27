@@ -18,6 +18,7 @@ contract SafeTrade {
     mapping(address => uint256) public balances;
     event buyEvent(uint256 indexed _itemId);
     event addItemEvent(uint256 indexed _itemId);
+    event withdrawAllEvent();
 
     function addItem(
         string _name,
@@ -64,10 +65,11 @@ contract SafeTrade {
         uint256 amount = balances[msg.sender];
         msg.sender.transfer(amount);
         balances[msg.sender] = 0;
+        emit withdrawAllEvent();
     }
 
-    function delete(uint256 _itemId) public {
-        require(msg.sender == items[_itemId].sellerm "Not authorized");
+    function removeListing(uint256 _itemId) public {
+        require(msg.sender == items[_itemId].seller, "Not authorized");
         require(!items[_itemId].isReserved, "Already reserved");
         items[_itemId].isDeleted = true;
     }
