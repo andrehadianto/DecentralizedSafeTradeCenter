@@ -101,8 +101,7 @@ App = {
                     withdrawData2.innerHTML = "TRANSFER TO: " + App.account;
                     var withdrawData3 = document.createElement("p");
                     withdrawData3.innerHTML =
-                        "AMOUNT: ETH " +
-                        web3.fromWei(accountBalance, "ether");
+                        "AMOUNT: ETH " + web3.fromWei(accountBalance, "ether");
 
                     withdrawWrapper.append(
                         withdrawData1,
@@ -151,7 +150,8 @@ App = {
 
                             var dealButton = document.createElement("button");
                             dealButton.innerHTML = "Deal";
-                            dealButton.className = "btn btn-dark";
+                            dealButton.className = "btn btn-primary";
+                            dealButton.style.cssText = "margin-right: 10px;";
                             dealButton.addEventListener("click", () => {
                                 App.contracts.SafeTrade.deployed()
                                     .then((instance) => {
@@ -167,6 +167,28 @@ App = {
                                         console.error(err);
                                     });
                             });
+
+                            var timeoutButton = document.createElement(
+                                "button"
+                            );
+                            timeoutButton.innerHTML = "Claim Timeout";
+                            timeoutButton.className = "btn btn-danger";
+                            timeoutButton.addEventListener("click", () => {
+                                App.contracts.SafeTrade.deployed()
+                                    .then((instance) => {
+                                        return instance.dealTimeout(id, {
+                                            from: App.account,
+                                        });
+                                    })
+                                    .then((res) => {
+                                        $("#content").hide();
+                                        $("#loader").show();
+                                    })
+                                    .then((err) => {
+                                        console.error(err);
+                                    });
+                            });
+
                             var itemTemplate = document.createElement("div");
                             itemTemplate.className = "col-6";
 
@@ -175,7 +197,7 @@ App = {
                             cardOuter.className = "card mb-3";
                             if (isReserved) {
                                 cardOuter.className =
-                                    "card mb-3 text-white bg-secondary";
+                                    "card mb-3 text-white bg-dark";
                             }
                             var cardRow = document.createElement("div");
                             cardRow.className = "row no-gutters";
@@ -244,7 +266,8 @@ App = {
                                     cardTitle,
                                     cardPrice,
                                     cardMeta,
-                                    dealButton
+                                    dealButton,
+                                    timeoutButton
                                 );
                             } else {
                                 cardBody_.append(
@@ -276,14 +299,9 @@ App = {
         var imgLink = $("#itemImg").val() ? $("#itemImg").val() : "";
         App.contracts.SafeTrade.deployed()
             .then((instance) => {
-                return instance.addItem(
-                    itemName,
-                    itemPrice,
-                    imgLink,
-                    {
-                        from: App.account,
-                    }
-                );
+                return instance.addItem(itemName, itemPrice, imgLink, {
+                    from: App.account,
+                });
             })
             .then((res) => {
                 $("#addItemModal").modal("hide");

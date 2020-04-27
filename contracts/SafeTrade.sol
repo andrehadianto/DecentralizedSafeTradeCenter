@@ -11,6 +11,7 @@ contract SafeTrade {
         address seller;
         string img;
         bool isDeleted;
+        uint256 dealTimeout;
     }
     uint256 public itemCount;
 
@@ -34,7 +35,8 @@ contract SafeTrade {
             false,
             msg.sender,
             _img,
-            false
+            false,
+            2**256 -1
         );
         emit addItemEvent(itemCount);
     }
@@ -46,6 +48,7 @@ contract SafeTrade {
         );
         require(items[_itemId].isReserved == false, "Item is reserved");
         require(_itemId > 0 && _itemId <= itemCount, "Invalid item id");
+        items[_itemId].dealTimeout = block.timestamp + 72 hours;
         items[_itemId].isReserved = true;
         items[_itemId].buyer = msg.sender;
         emit buyEvent(_itemId);
@@ -61,6 +64,13 @@ contract SafeTrade {
         balances[items[_itemId].seller] += items[_itemId].price;
     }
 
+    function dealTimeout(uint256 _itemId) public payable {
+        require(msg.sender == items[_itemId].buyer, "Not authorized");
+        require(items[_itemId].dealTimeout < block.timestamp, "expiry date not reached");
+        items[_itemId].isDeleted = true;
+        balances[items[_itemId].buyer] += items[_itemId].price;
+    }
+
     function withdrawAll() public payable {
         uint256 amount = balances[msg.sender];
         msg.sender.transfer(amount);
@@ -73,4 +83,5 @@ contract SafeTrade {
         require(!items[_itemId].isReserved, "Already reserved");
         items[_itemId].isDeleted = true;
     }
+
 }
