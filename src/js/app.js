@@ -61,7 +61,6 @@ App = {
                 )
                 .watch((err, event) => {
                     console.log("event triggered", event);
-                    App.render();
                 });
         });
     },
@@ -102,7 +101,8 @@ App = {
                     withdrawData2.innerHTML = "TRANSFER TO: " + App.account;
                     var withdrawData3 = document.createElement("p");
                     withdrawData3.innerHTML =
-                        "AMOUNT: ETH " + accountBalance / Math.pow(10, 18);
+                        "AMOUNT: ETH " +
+                        web3.fromWei(accountBalance, "ether");
 
                     withdrawWrapper.append(
                         withdrawData1,
@@ -118,7 +118,7 @@ App = {
                     safeTradeInstance.items(i).then((item) => {
                         var id = item[0];
                         var name = item[1];
-                        var itemPrice = item[2] / Math.pow(10, 18);
+                        var itemPrice = web3.fromWei(item[2], "ether");
                         var buyer = item[3];
                         var isReserved = item[4];
                         var seller = item[5];
@@ -272,13 +272,18 @@ App = {
 
     addItem: () => {
         var itemName = $("#itemName").val();
-        var itemPrice = $("#itemPrice").val() * Math.pow(10, 18);
+        var itemPrice = web3.toWei($("#itemPrice").val(), "ether");
         var imgLink = $("#itemImg").val() ? $("#itemImg").val() : "";
         App.contracts.SafeTrade.deployed()
             .then((instance) => {
-                return instance.addItem(itemName, itemPrice, imgLink, {
-                    from: App.account,
-                });
+                return instance.addItem(
+                    itemName,
+                    itemPrice,
+                    imgLink,
+                    {
+                        from: App.account,
+                    }
+                );
             })
             .then((res) => {
                 $("#addItemModal").modal("hide");
