@@ -10,15 +10,20 @@ contract SafeTrade {
         bool isReserved;
         address seller;
         string img;
-        bool isPurchased;
+        bool isDeleted;
     }
     uint256 public itemCount;
 
     mapping(uint256 => Item) public items;
+    mapping(address => uint256) public balances;
     event buyEvent(uint256 indexed _itemId);
     event addItemEvent(uint256 indexed _itemId);
 
-    function addItem(string _name, uint256 _price, string _img) public {
+    function addItem(
+        string _name,
+        uint256 _price,
+        string _img
+    ) public {
         itemCount++;
         items[itemCount] = Item(
             itemCount,
@@ -46,12 +51,24 @@ contract SafeTrade {
     }
 
     function confirm(uint256 _itemId) public payable {
-        require(msg.sender == items[_itemId].seller, "Invalid authorization");
         require(
             items[_itemId].buyer != 0x0 && items[_itemId].isReserved == true,
             "No buyer yet"
         );
-        items[_itemId].isPurchased = true;
-        msg.sender.transfer(address(this).balance);
+        require(msg.sender == items[_itemId].buyer, "Not authorized");
+        items[_itemId].isDeleted = true;
+        balances[items[_itemId].seller] += items[_itemId].price;
+    }
+
+    function withdrawAll() public payable {
+        uint256 amount = balances[msg.sender];
+        msg.sender.transfer(amount);
+        balances[msg.sender] = 0;
+    }
+
+    function delete(uint256 _itemId) public {
+        require(msg.sender == items[_itemId].sellerm "Not authorized");
+        require(!items[_itemId].isReserved, "Already reserved");
+        items[_itemId].isDeleted = true;
     }
 }
