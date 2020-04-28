@@ -290,6 +290,7 @@ App = {
                                 cardOuter.append(cardRow);
                                 itemTemplate.append(cardOuter);
                             }
+                            itemListing.append(itemTemplate);
                         });
                     }
                 } else {
@@ -302,8 +303,8 @@ App = {
                     emptyText.innerHTML = "Be the first one to post a listing!";
 
                     itemTemplate.append(emptyIcon, emptyText);
+                    itemListing.append(itemTemplate);
                 }
-                itemListing.append(itemTemplate);
                 loader.hide();
                 content.show();
             })

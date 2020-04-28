@@ -37,7 +37,7 @@ contract SafeTrade {
             msg.sender,
             _img,
             false,
-            2**256 -1
+            2**256-1
         );
         emit addItemEvent(itemCount);
     }
