@@ -56,7 +56,12 @@
                 <label for="itemName">Item Name</label>
                 <input class="form-control" id="itemName"/>
                 <label for="itemPrice">Price</label>
-                <input class="form-control" type="number" id="itemPrice"/>
+                <div class="input-group mb-2">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">ETH</div>
+                  </div>
+                  <input type="number" class="form-control" id="itemPrice" placeholder=999>
+                </div>
                 <label for="itemImg">Link to img</label>
                 <input class="form-control" id="itemImg" placeholder="(Optional)"/>
               </div>
@@ -88,6 +93,7 @@
               <div class="spinner-border" role="status">
                 <span class="sr-only">Loading...</span>
               </div>
+              <p>Are you logged in to your MetaMask?</p>
             </div>
             <div id="content" style="display: none;">
               <div class="row" id="itemListing"></div>

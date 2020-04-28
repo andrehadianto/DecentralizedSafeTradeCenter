@@ -113,178 +113,197 @@ App = {
 
                 var itemListing = $("#itemListing");
                 itemListing.empty();
-                for (var i = 1; i <= itemCount.toNumber(); i++) {
-                    safeTradeInstance.items(i).then((item) => {
-                        var id = item[0];
-                        var name = item[1];
-                        var itemPrice = web3.fromWei(item[2], "ether");
-                        var buyer = item[3];
-                        var isReserved = item[4];
-                        var seller = item[5];
-                        var img = item[6];
-                        var isDeleted = item[7];
-                        if (!isDeleted) {
-                            var buyButton = document.createElement("button");
-                            buyButton.innerHTML = "Buy";
-                            buyButton.className = "btn btn-primary";
-                            buyButton.style.cssText = "margin-right:10px;";
-                            buyButton.addEventListener("click", () => {
-                                App.contracts.SafeTrade.deployed()
-                                    .then((instance) => {
-                                        return instance.buy(id, {
-                                            from: App.account,
-                                            value: web3.toWei(
-                                                itemPrice,
-                                                "ether"
-                                            ),
-                                        });
-                                    })
-                                    .then((res) => {
-                                        content.hide();
-                                        loader.show();
-                                    })
-                                    .catch((err) => {
-                                        console.error(err);
-                                    });
-                            });
-
-                            var dealButton = document.createElement("button");
-                            dealButton.innerHTML = "Deal";
-                            dealButton.className = "btn btn-primary";
-                            dealButton.style.cssText = "margin-right: 10px;";
-                            dealButton.addEventListener("click", () => {
-                                App.contracts.SafeTrade.deployed()
-                                    .then((instance) => {
-                                        return instance.confirm(id, {
-                                            from: App.account,
-                                        });
-                                    })
-                                    .then((res) => {
-                                        $("#content").hide();
-                                        $("#loader").show();
-                                    })
-                                    .then((err) => {
-                                        console.error(err);
-                                    });
-                            });
-
-                            var timeoutButton = document.createElement(
-                                "button"
-                            );
-                            timeoutButton.innerHTML = "Claim Timeout";
-                            timeoutButton.className = "btn btn-danger";
-                            timeoutButton.addEventListener("click", () => {
-                                App.contracts.SafeTrade.deployed()
-                                    .then((instance) => {
-                                        return instance.dealTimeout(id, {
-                                            from: App.account,
-                                        });
-                                    })
-                                    .then((res) => {
-                                        $("#content").hide();
-                                        $("#loader").show();
-                                    })
-                                    .then((err) => {
-                                        console.error(err);
-                                    });
-                            });
-
-                            var itemTemplate = document.createElement("div");
-                            itemTemplate.className = "col-6";
-
-                            var cardOuter = document.createElement("div");
-                            cardOuter.style.cssText = "max-width: 600px;";
-                            cardOuter.className = "card mb-3";
-                            if (isReserved) {
-                                cardOuter.className =
-                                    "card mb-3 text-white bg-dark";
-                            }
-                            var cardRow = document.createElement("div");
-                            cardRow.className = "row no-gutters";
-                            var cardImg = document.createElement("div");
-                            cardImg.className = "col-md-4";
-                            var cardImg_ = document.createElement("img");
-                            cardImg_.className = "card-img";
-                            cardImg_.style.cssText = "height: 241.04px;";
-                            cardImg_.src = img;
-                            cardImg.append(cardImg_);
-
-                            var cardBody = document.createElement("div");
-                            cardBody.className = "col-md-8";
-                            var cardBody_ = document.createElement("div");
-                            cardBody_.className = "card-body";
-                            cardBody.append(cardBody_);
-
-                            var cardClose = document.createElement("span");
-                            cardClose.className = "pull-right clickable";
-                            cardClose.style.cssText = "cursor: pointer;";
-                            cardClose.addEventListener("click", () => {
-                                App.contracts.SafeTrade.deployed()
-                                    .then((instance) => {
-                                        return instance.removeListing(id, {
-                                            from: App.account,
-                                        });
-                                    })
-                                    .then(() => {
-                                        $("#content").hide();
-                                        $("#loader").show();
-                                    })
-                                    .catch((err) => {
-                                        console.error(err);
-                                    });
-                            });
-                            var cardIcon = document.createElement("i");
-                            cardIcon.className = "fa fa-times";
-                            cardClose.append(cardIcon);
-
-                            var cardTitle = document.createElement("h5");
-                            cardTitle.className = "card-title";
-                            cardTitle.innerHTML = name;
-                            if (isReserved) {
-                                cardTitle.innerHTML =
-                                    name +
-                                    " <span class='badge  badge-warning'>RESERVED</span>";
-                            }
-
-                            var cardPrice = document.createElement("h1");
-                            cardPrice.className = "card-text display-4";
-                            cardPrice.innerHTML = "ETH " + itemPrice;
-
-                            var cardMeta = document.createElement("p");
-                            cardMeta.className = "card-text small";
-                            cardMeta.innerHTML = "</br>Seller: " + seller;
-                            if (isReserved) {
-                                cardMeta.innerHTML =
-                                    "Buyer: " +
-                                    buyer +
-                                    "</br>" +
-                                    "Seller: " +
-                                    seller;
-                            }
-                            if (isReserved) {
-                                cardBody_.append(
-                                    cardTitle,
-                                    cardPrice,
-                                    cardMeta,
-                                    dealButton,
-                                    timeoutButton
+                if (itemCount > 0) {
+                    for (var i = 1; i <= itemCount.toNumber(); i++) {
+                        safeTradeInstance.items(i).then((item) => {
+                            var id = item[0];
+                            var name = item[1];
+                            var itemPrice = web3.fromWei(item[2], "ether");
+                            var buyer = item[3];
+                            var isReserved = item[4];
+                            var seller = item[5];
+                            var img = item[6];
+                            var isDeleted = item[7];
+                            if (!isDeleted) {
+                                var buyButton = document.createElement(
+                                    "button"
                                 );
-                            } else {
-                                cardBody_.append(
-                                    cardClose,
-                                    cardTitle,
-                                    cardPrice,
-                                    cardMeta,
-                                    buyButton
+                                buyButton.innerHTML = "Buy";
+                                buyButton.className = "btn btn-primary";
+                                buyButton.style.cssText = "margin-right:10px;";
+                                buyButton.addEventListener("click", () => {
+                                    App.contracts.SafeTrade.deployed()
+                                        .then((instance) => {
+                                            return instance.buy(id, {
+                                                from: App.account,
+                                                value: web3.toWei(
+                                                    itemPrice,
+                                                    "ether"
+                                                ),
+                                            });
+                                        })
+                                        .then((res) => {
+                                            content.hide();
+                                            loader.show();
+                                        })
+                                        .catch((err) => {
+                                            console.error(err);
+                                        });
+                                });
+
+                                var dealButton = document.createElement(
+                                    "button"
                                 );
+                                dealButton.innerHTML = "Deal";
+                                dealButton.className = "btn btn-primary";
+                                dealButton.style.cssText =
+                                    "margin-right: 10px;";
+                                dealButton.addEventListener("click", () => {
+                                    App.contracts.SafeTrade.deployed()
+                                        .then((instance) => {
+                                            return instance.confirm(id, {
+                                                from: App.account,
+                                            });
+                                        })
+                                        .then((res) => {
+                                            $("#content").hide();
+                                            $("#loader").show();
+                                        })
+                                        .then((err) => {
+                                            console.error(err);
+                                        });
+                                });
+
+                                var timeoutButton = document.createElement(
+                                    "button"
+                                );
+                                timeoutButton.innerHTML = "Claim Timeout";
+                                timeoutButton.className = "btn btn-danger";
+                                timeoutButton.addEventListener("click", () => {
+                                    App.contracts.SafeTrade.deployed()
+                                        .then((instance) => {
+                                            return instance.dealTimeout(id, {
+                                                from: App.account,
+                                            });
+                                        })
+                                        .then((res) => {
+                                            $("#content").hide();
+                                            $("#loader").show();
+                                        })
+                                        .then((err) => {
+                                            console.error(err);
+                                        });
+                                });
+
+                                var itemTemplate = document.createElement(
+                                    "div"
+                                );
+                                itemTemplate.className = "col-6";
+
+                                var cardOuter = document.createElement("div");
+                                cardOuter.style.cssText = "max-width: 600px;";
+                                cardOuter.className = "card mb-3";
+                                if (isReserved) {
+                                    cardOuter.className =
+                                        "card mb-3 text-white bg-dark";
+                                }
+                                var cardRow = document.createElement("div");
+                                cardRow.className = "row no-gutters";
+                                var cardImg = document.createElement("div");
+                                cardImg.className = "col-md-4";
+                                var cardImg_ = document.createElement("img");
+                                cardImg_.className = "card-img";
+                                cardImg_.style.cssText = "height: 241.04px;";
+                                cardImg_.src = img;
+                                cardImg.append(cardImg_);
+
+                                var cardBody = document.createElement("div");
+                                cardBody.className = "col-md-8";
+                                var cardBody_ = document.createElement("div");
+                                cardBody_.className = "card-body";
+                                cardBody.append(cardBody_);
+
+                                var cardClose = document.createElement("span");
+                                cardClose.className = "pull-right clickable";
+                                cardClose.style.cssText = "cursor: pointer;";
+                                cardClose.addEventListener("click", () => {
+                                    App.contracts.SafeTrade.deployed()
+                                        .then((instance) => {
+                                            return instance.removeListing(id, {
+                                                from: App.account,
+                                            });
+                                        })
+                                        .then(() => {
+                                            $("#content").hide();
+                                            $("#loader").show();
+                                        })
+                                        .catch((err) => {
+                                            console.error(err);
+                                        });
+                                });
+                                var cardIcon = document.createElement("i");
+                                cardIcon.className = "fa fa-times";
+                                cardClose.append(cardIcon);
+
+                                var cardTitle = document.createElement("h5");
+                                cardTitle.className = "card-title";
+                                cardTitle.innerHTML = name;
+                                if (isReserved) {
+                                    cardTitle.innerHTML =
+                                        name +
+                                        " <span class='badge  badge-warning'>RESERVED</span>";
+                                }
+
+                                var cardPrice = document.createElement("h1");
+                                cardPrice.className = "card-text display-4";
+                                cardPrice.innerHTML = "ETH " + itemPrice;
+
+                                var cardMeta = document.createElement("p");
+                                cardMeta.className = "card-text small";
+                                cardMeta.innerHTML = "</br>Seller: " + seller;
+                                if (isReserved) {
+                                    cardMeta.innerHTML =
+                                        "Buyer: " +
+                                        buyer +
+                                        "</br>" +
+                                        "Seller: " +
+                                        seller;
+                                }
+                                if (isReserved) {
+                                    cardBody_.append(
+                                        cardTitle,
+                                        cardPrice,
+                                        cardMeta,
+                                        dealButton,
+                                        timeoutButton
+                                    );
+                                } else {
+                                    cardBody_.append(
+                                        cardClose,
+                                        cardTitle,
+                                        cardPrice,
+                                        cardMeta,
+                                        buyButton
+                                    );
+                                }
+                                cardRow.append(cardImg, cardBody);
+                                cardOuter.append(cardRow);
+                                itemTemplate.append(cardOuter);
                             }
-                            cardRow.append(cardImg, cardBody);
-                            cardOuter.append(cardRow);
-                            itemTemplate.append(cardOuter);
-                            itemListing.append(itemTemplate);
-                        }
-                    });
+                        });
+                    }
+                } else {
+                    var itemTemplate = document.createElement("div");
+                    itemTemplate.className = "col-12 text-center";
+                    var emptyIcon = document.createElement("i");
+                    emptyIcon.className = "fa fa-archive fa-4x";
+                    var emptyText = document.createElement("p");
+                    emptyText.className = "lead";
+                    emptyText.innerHTML = "Be the first one to post a listing!";
+
+                    itemTemplate.append(emptyIcon, emptyText);
                 }
+                itemListing.append(itemTemplate);
                 loader.hide();
                 content.show();
             })

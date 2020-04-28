@@ -14,6 +14,7 @@ contract SafeTrade {
         uint256 dealTimeout;
     }
     uint256 public itemCount;
+    bool isLocked = false;
 
     mapping(uint256 => Item) public items;
     mapping(address => uint256) public balances;
@@ -72,9 +73,12 @@ contract SafeTrade {
     }
 
     function withdrawAll() public payable {
+        require(!isLocked, "function locked");
+        isLocked = true;
         uint256 amount = balances[msg.sender];
         msg.sender.transfer(amount);
         balances[msg.sender] = 0;
+        isLocked = false;
         emit withdrawAllEvent();
     }
 
